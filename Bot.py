@@ -138,22 +138,23 @@ def extract_product_id(link):
 def generate_coin_affiliate_link(product_id):
     """Generate affiliate link using coin-index system for 620 channel"""
     try:
-        coin_index_url = f"https://m.aliexpress.com/p/coin-index/index.html?_immersiveMode=true&from=syicon&productIds={product_id}"
-        affiliate_link = aliexpress.get_affiliate_links(coin_index_url)
-        return affiliate_link[0].promotion_link
+        # 1. מייצרים קודם כל קישור שותפים רגיל לחלוטין לדף המוצר הרגיל
+        standard_product_url = f"https://www.aliexpress.com/item/{product_id}.html"
+        affiliate_link_data = aliexpress.get_affiliate_links(standard_product_url)
+        
+        if not affiliate_link_data or len(affiliate_link_data) == 0:
+            return None
+            
+        base_affiliate_link = affiliate_link_data[0].promotion_link
+        
+        # 2. מוסיפים את הפרמטרים שגורמים לאליאקספרס לפתוח את זה דרך פיצ'ר המטבעות (ערוץ 620)
+        # בודקים אם יש כבר סימן שאלה בקישור כדי לדעת איך לשרשר
+        separator = "&" if "?" in base_affiliate_link else "?"
+        coin_affiliate_link = f"{base_affiliate_link}{separator}sourceType=620&_immersiveMode=true&from=syicon"
+        
+        return coin_affiliate_link
     except Exception as e:
         print(f"❌ Error generating coin affiliate link for product {product_id}: {e}")
-        return None
-
-# יצירת קישור שותפים מבוסס חבילה (ערוץ 560)
-def generate_bundle_affiliate_link(product_id, original_link):
-    """Generate affiliate link using bundle system for 560 channel"""
-    try:
-        bundle_url = f'https://star.aliexpress.com/share/share.htm?platform=AE&businessType=ProductDetail&redirectUrl={original_link}?sourceType=560&aff_fcid='
-        affiliate_link = aliexpress.get_affiliate_links(bundle_url)
-        return affiliate_link[0].promotion_link
-    except Exception as e:
-        print(f"❌ Error generating bundle affiliate link for product {product_id}: {e}")
         return None
 
 # פקודות והודעות בוט
