@@ -394,7 +394,7 @@ def webhook():
         return 'OK', 200
 
 def run_flask():
-    app.run(host='0.0.0.0', port=10000)
+    app.run(host='0.0.0.0', PORT=10000)
 
 if __name__ == "__main__":
     webhook_url = os.getenv('WEBHOOK_URL')
