@@ -11,69 +11,69 @@ import urllib.parse
 import requests
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
+# טעינת משתני סביבה מקובץ .env
 load_dotenv()
 
-# Initialize the bot with the token
+# אתחול הבוט עם הטוקן
 TELEGRAM_TOKEN_BOT = os.getenv('TELEGRAM_BOT_TOKEN')
 ALIEXPRESS_API_PUBLIC = os.getenv('ALIEXPRESS_API_PUBLIC')
 ALIEXPRESS_API_SECRET = os.getenv('ALIEXPRESS_API_SECRET')
 
-# Check if required environment variables are set
+# בדיקה אם משתני הסביבה הנדרשים מוגדרים
 if not TELEGRAM_TOKEN_BOT:
-    print("❌ Error: TELEGRAM_BOT_TOKEN environment variable is not set!")
-    print("Please set the environment variable or create a .env file with your bot token.")
+    print("❌ שגיאה: משתנה הסביבה TELEGRAM_BOT_TOKEN אינו מוגדר!")
+    print("אנא הגדר את משתנה הסביבה או צור קובץ .env עם הטוקן של הבוט שלך.")
     exit(1)
 
 if not ALIEXPRESS_API_PUBLIC or not ALIEXPRESS_API_SECRET:
-    print("❌ Error: ALIEXPRESS_API_PUBLIC and ALIEXPRESS_API_SECRET environment variables are not set!")
-    print("Please set the environment variables or create a .env file with your API credentials.")
+    print("❌ שגיאה: משתני הסביבה ALIEXPRESS_API_PUBLIC ו-ALIEXPRESS_API_SECRET אינם מוגדרים!")
+    print("אנא הגדר את משתני הסביבה או צור קובץ .env עם פרטי ה-API שלך.")
     exit(1)
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN_BOT)
 
-# Initialize Aliexpress API
+# אתחול AliExpress API (מוגדר כבר ל-HE ולמטבע NIS)
 try:
     aliexpress = AliexpressApi(ALIEXPRESS_API_PUBLIC, ALIEXPRESS_API_SECRET,
-                               models.Language.AR, models.Currency.EUR, 'telegramBot')
-    print("AliExpress API initialized successfully.")
+                               models.Language.HE, models.Currency.EUR, 'default')
+    print("AliExpress API אותחל בהצלחה.")
 except Exception as e:
-    print(f"Error initializing AliExpress API: {e}")
+    print(f"שגיאה באתחול AliExpress API: {e}")
 
-# Define keyboards
+# הגדרת מקלדות (כפתורי Inline)
 keyboardStart = types.InlineKeyboardMarkup(row_width=1)
-btn1 = types.InlineKeyboardButton("⭐️ صفحة مراجعة وجمع النقاط يوميا ⭐️", url="https://s.click.aliexpress.com/e/_DdwUZVd")
-btn2 = types.InlineKeyboardButton("⭐️تخفيض العملات على منتجات السلة 🛒⭐️", callback_data='click')
-btn3 = types.InlineKeyboardButton("❤️ اشترك في القناة للمزيد من العروض ❤️", url="https://t.me/ShopAliExpressMaroc")
-btn4 = types.InlineKeyboardButton("🎬 شاهد كيفية عمل البوت 🎬", url="https://t.me/ShopAliExpressMaroc/9")
-btn5 = types.InlineKeyboardButton("💰 حمل تطبيق Aliexpress عبر الضغط هنا للحصول على مكافأة 5 دولار 💰", url="https://a.aliexpress.com/_mtV0j3q")
+btn1 = types.InlineKeyboardButton("⭐️ דף בדיקה ואיסוף נקודות יומי ⭐️", url="https://s.click.aliexpress.com/e/_DdwUZVd")
+btn2 = types.InlineKeyboardButton("⭐️ הנחת מטבעות על מוצרים בעגלה 🛒⭐️", callback_data='click')
+btn3 = types.InlineKeyboardButton("❤️ הצטרפו לערוץ לעוד מבצעים ❤️", url="https://t.me/ShopAliExpressMaroc")
+btn4 = types.InlineKeyboardButton("🎬 צפו כיצד הבוט עובד 🎬", url="https://t.me/ShopAliExpressMaroc/9")
+btn5 = types.InlineKeyboardButton("💰 הורד את אפליקציית Aliexpress כאן וקבל בונוס של 5$ 💰", url="https://a.aliexpress.com/_mtV0j3q")
 keyboardStart.add(btn1, btn2, btn3, btn4)
 
 keyboard = types.InlineKeyboardMarkup(row_width=1)
-btn1 = types.InlineKeyboardButton("⭐️ صفحة مراجعة وجمع النقاط يوميا ⭐️", url="https://s.click.aliexpress.com/e/_DdwUZVd")
-btn2 = types.InlineKeyboardButton("⭐️تخفيض العملات على منتجات السلة 🛒⭐️", callback_data='click')
-btn3 = types.InlineKeyboardButton("❤️ اشترك في القناة للمزيد من العروض ❤️", url="https://t.me/ShopAliExpressMaroc")
+btn1 = types.InlineKeyboardButton("⭐️ דף בדיקה ואיסוף נקודות יומי ⭐️", url="https://s.click.aliexpress.com/e/_DdwUZVd")
+btn2 = types.InlineKeyboardButton("⭐️ הנחת מטבעות על מוצרים בעגלה 🛒⭐️", callback_data='click')
+btn3 = types.InlineKeyboardButton("❤️ הצטרפו לערוץ לעוד מבצעים ❤️", url="https://t.me/ShopAliExpressMaroc")
 keyboard.add(btn1, btn2, btn3)
 
 keyboard_games = types.InlineKeyboardMarkup(row_width=1)
-btn1 = types.InlineKeyboardButton("⭐️ صفحة مراجعة وجمع النقاط يوميا ⭐️", url="https://s.click.aliexpress.com/e/_DdwUZVd")
-btn2 = types.InlineKeyboardButton("⭐️ لعبة Merge boss ⭐️", url="https://s.click.aliexpress.com/e/_DlCyg5Z")
-btn3 = types.InlineKeyboardButton("⭐️ لعبة Fantastic Farm ⭐️", url="https://s.click.aliexpress.com/e/_DBBkt9V")
-btn4 = types.InlineKeyboardButton("⭐️ لعبة قلب الاوراق Flip ⭐️", url="https://s.click.aliexpress.com/e/_DdcXZ2r")
-btn5 = types.InlineKeyboardButton("⭐️ لعبة GoGo Match ⭐️", url="https://s.click.aliexpress.com/e/_DDs7W5D")
+btn1 = types.InlineKeyboardButton("⭐️ דף בדיקה ואיסוף נקודות יומי ⭐️", url="https://s.click.aliexpress.com/e/_DdwUZVd")
+btn2 = types.InlineKeyboardButton("⭐️ משחק Merge Boss ⭐️", url="https://s.click.aliexpress.com/e/_DlCyg5Z")
+btn3 = types.InlineKeyboardButton("⭐️ משחק החווה (Fantastic Farm) ⭐️", url="https://s.click.aliexpress.com/e/_DBBkt9V")
+btn4 = types.InlineKeyboardButton("⭐️ משחק היפוך קלפים Flip ⭐️", url="https://s.click.aliexpress.com/e/_DdcXZ2r")
+btn5 = types.InlineKeyboardButton("⭐️ משחק GoGo Match ⭐️", url="https://s.click.aliexpress.com/e/_DDs7W5D")
 keyboard_games.add(btn1, btn2, btn3, btn4, btn5)
 
-# Define function to get exchange rate from USD to MAD
-def get_usd_to_mad_rate():
+# פונקציה לקבלת שער חליפין מ-USD ל-ILS
+def get_usd_to_ils_rate():
     try:
         response = requests.get('https://api.exchangerate-api.com/v4/latest/USD')
         data = response.json()
-        return data['rates']['MAD']
+        return data['rates']['ILS']
     except Exception as e:
-        print(f"Error fetching exchange rate: {e}")
+        print(f"שגיאה בקבלת שער חליפין: {e}")
         return None
 
-# Define function to resolve redirect chain and get final URL
+# פונקציה למעקב אחר הפניות וקבלת ה-URL הסופי
 def resolve_full_redirect_chain(link):
     """Resolve all redirects to get the final URL"""
     headers = {
@@ -88,7 +88,6 @@ def resolve_full_redirect_chain(link):
         print(f"🔗 Resolved URL: {link} -> {final_url}")
         
         if "star.aliexpress.com" in final_url:
-            # Extract redirectUrl parameter
             parsed_url = urlparse(final_url)
             params = parse_qs(parsed_url.query)
             if 'redirectUrl' in params:
@@ -104,33 +103,29 @@ def resolve_full_redirect_chain(link):
             return final_url
     except requests.RequestException as e:
         print(f"❌ Error resolving redirect chain for link {link}: {e}")
-        return link  # Return original link if resolution fails
+        return link
 
-# Define function to extract product ID from link
+# פונקציה לחילוץ מזהה מוצר מהקישור
 def extract_product_id(link):
     """Extract product ID from AliExpress link (handles redirected/shortened links)"""
     print(f"🔍 Extracting product ID from: {link}")
     
-    # First resolve any redirects to get the final URL
     resolved_link = resolve_full_redirect_chain(link)
     print(f"🔗 Using resolved link: {resolved_link}")
     
-    # Standard product page pattern
     product_id_pattern = r'/item/(\d+)\.html'
     match = re.search(product_id_pattern, resolved_link)
     if match:
         print(f"✅ Extracted product ID (standard): {match.group(1)}")
         return match.group(1)
     
-    # Coin page pattern - extract from productIds parameter
     coin_page_pattern = r'productIds=(\d+)'
     coin_match = re.search(coin_page_pattern, resolved_link)
     if coin_match:
         print(f"✅ Extracted product ID (coin-index): {coin_match.group(1)}")
         return coin_match.group(1)
     
-    # Alternative pattern for different URL formats (long product IDs)
-    product_id_pattern_alt = r'(\d{13,})'  # Long product IDs
+    product_id_pattern_alt = r'(\d{13,})'
     match_alt = re.search(product_id_pattern_alt, resolved_link)
     if match_alt:
         print(f"✅ Extracted product ID (long format): {match_alt.group(1)}")
@@ -139,42 +134,36 @@ def extract_product_id(link):
     print(f"❌ Could not extract product ID from: {resolved_link}")
     return None
 
-# Define function to generate coin-index affiliate link for 620 channel
+# יצירת קישור שותפים מבוסס מטבעות (ערוץ 620)
 def generate_coin_affiliate_link(product_id):
     """Generate affiliate link using coin-index system for 620 channel"""
     try:
-        # Create the coin-index URL
         coin_index_url = f"https://m.aliexpress.com/p/coin-index/index.html?_immersiveMode=true&from=syicon&productIds={product_id}"
-        
-        # Generate affiliate link using the coin-index URL
         affiliate_link = aliexpress.get_affiliate_links(coin_index_url)
         return affiliate_link[0].promotion_link
     except Exception as e:
         print(f"❌ Error generating coin affiliate link for product {product_id}: {e}")
         return None
 
-# Define function to generate bundle affiliate link for 560 channel
+# יצירת קישור שותפים מבוסס חבילה (ערוץ 560)
 def generate_bundle_affiliate_link(product_id, original_link):
     """Generate affiliate link using bundle system for 560 channel"""
     try:
-        # Create the bundle URL with sourceType=560
         bundle_url = f'https://star.aliexpress.com/share/share.htm?platform=AE&businessType=ProductDetail&redirectUrl={original_link}?sourceType=560&aff_fcid='
-        
-        # Generate affiliate link using the bundle URL
         affiliate_link = aliexpress.get_affiliate_links(bundle_url)
         return affiliate_link[0].promotion_link
     except Exception as e:
         print(f"❌ Error generating bundle affiliate link for product {product_id}: {e}")
         return None
 
-# Define bot handlers
+# פקודות והודעות בוט
 @bot.message_handler(commands=['start'])
 def welcome_user(message):
     print("Handling /start command")
     bot.send_message(
         message.chat.id,
-        "مرحبا بكم👋 \n" 
-        "أنا علي إكسبريس بوت أقوم بتخفيض المنتجات و البحث  عن أفضل العروض إنسخ رابط المنتج وضعه هنا 👇 ستجد جميع عروض المنتج بثمن أقل 🔥",
+        "ברוכים הבאים 👋 \n" 
+        "אני בוט אליאקספרס שמסייע בהורדת מחירים ומציאת הדילים הטובים ביותר! העתיקו את קישור המוצר והדביקו אותו כאן 👇 ותקבלו את כל ההצעות הזולות ביותר למוצר 🔥",
         reply_markup=keyboardStart)
 
 @bot.message_handler(func=lambda message: True)
@@ -182,7 +171,7 @@ def echo_all(message):
     try:
         print(f"Message received: {message.text}")
         link = extract_link(message.text)
-        sent_message = bot.send_message(message.chat.id, 'المرجو الانتظار قليلا، يتم تجهيز العروض ⏳')
+        sent_message = bot.send_message(message.chat.id, 'אנא המתינו רגע, המבצעים בדרך אליכם... ⏳')
         message_id = sent_message.message_id
         if link and "aliexpress.com" in link and not ("p/shoppingcart" in message.text.lower()):
             if "availableProductShopcartIds".lower() in message.text.lower():
@@ -191,8 +180,8 @@ def echo_all(message):
             get_affiliate_links(message, message_id, link)
         else:
             bot.delete_message(message.chat.id, message_id)
-            bot.send_message(message.chat.id, "الرابط غير صحيح ! تأكد من رابط المنتج أو اعد المحاولة.\n"
-                                              " قم بإرسال <b> الرابط فقط</b> بدون عنوان المنتج",
+            bot.send_message(message.chat.id, "הקישור אינו תקין! ודא שמדובר בקישור למוצר ונסה שנית.\n"
+                                             "שלח את <b>הקישור בלבד</b> ללא כותרת או טקסט נוסף.",
                              parse_mode='HTML')
     except Exception as e:
         print(f"Error in echo_all handler: {e}")
@@ -207,27 +196,21 @@ def extract_link(text):
 
 def get_affiliate_links(message, message_id, link):
     try:
-        # Resolve the full redirect chain first
         resolved_link = resolve_full_redirect_chain(link)
         if not resolved_link:
             bot.delete_message(message.chat.id, message_id)
-            bot.send_message(message.chat.id, "❌ لم أتمكن من حل الرابط! تأكد من رابط المنتج أو أعد المحاولة.")
+            bot.send_message(message.chat.id, "❌ לא הצלחתי לפענח את הקישור! בדוק את הקישור ונסה שנית.")
             return
 
-        # Extract product ID from the resolved link
         product_id = extract_product_id(resolved_link)
         if not product_id:
             bot.delete_message(message.chat.id, message_id)
-            bot.send_message(message.chat.id, "❌ لم أتمكن من استخراج معرف المنتج من الرابط.")
+            bot.send_message(message.chat.id, "❌ לא הצלחתי לחלץ את מזהה המוצר (Product ID) מהקישור.")
             return
 
-        # Generate coin-index affiliate link for 620 channel
         coin_affiliate_link = generate_coin_affiliate_link(product_id)
-        
-        # Generate bundle affiliate link for 560 channel
         bundle_affiliate_link = generate_bundle_affiliate_link(product_id, resolved_link)
         
-        # Generate other affiliate links using traditional method
         super_links = aliexpress.get_affiliate_links(
             f'https://star.aliexpress.com/share/share.htm?platform=AE&businessType=ProductDetail&redirectUrl={resolved_link}?sourceType=562&aff_fcid='
         )
@@ -239,56 +222,50 @@ def get_affiliate_links(message, message_id, link):
         limit_links = limit_links[0].promotion_link
 
         try:
-            # Get product details using the product ID
             product_details = aliexpress.get_products_details([
                 product_id
             ], fields=["target_sale_price", "product_title", "product_main_image_url"])
             
             if product_details and len(product_details) > 0:
-                # Print all details of product in JSON format for debugging
                 print(f"Product details object: {json.dumps(product_details[0].__dict__, indent=2, ensure_ascii=False)}")
                 price_pro = float(product_details[0].target_sale_price)
                 title_link = product_details[0].product_title
                 img_link = product_details[0].product_main_image_url
                 
-                # Convert price to MAD
-                exchange_rate = get_usd_to_mad_rate()
+                exchange_rate = get_usd_to_ils_rate()
                 if exchange_rate:
-                    price_pro_mad = price_pro * exchange_rate
+                    price_pro_ils = price_pro * exchange_rate
                 else:
-                    price_pro_mad = price_pro  # fallback to USD if exchange rate not available
+                    price_pro_ils = price_pro  # fallback במידה ושער החליפין לא זמין
                 
                 print(f"Product details: {title_link}, {price_pro}, {img_link}")
                 bot.delete_message(message.chat.id, message_id)
                 
-                # Build the message with all affiliate links
                 message_text = (
-                    f" \n🛒 منتجك هو : 🔥 \n"
+                    f" \n🛒 המוצר שלך: 🔥 \n"
                     f" {title_link} 🛍 \n"
-                    f" سعر المنتج : "
-                    f" {price_pro:.2f} دولار 💵 / {price_pro_mad:.2f} درهم مغربي 💵\n"
-                    " \n قارن بين الاسعار واشتري 🔥 \n"
+                    f" מחיר המוצר: "
+                    f" {price_pro:.2f} דולר 💵 / {price_pro_ils:.2f} ש\"ח 💵\n"
+                    " \n השוו בין המחירים וקנו חכם 🔥 \n"
                 )
                 
-                # Add coin-index affiliate link for 620 channel if available
                 if coin_affiliate_link:
                     message_text += (
-                        "💰 عرض العملات (السعر النهائي عند الدفع) : \n"
-                        f"الرابط {coin_affiliate_link} \n"
+                        "💰 מבצע מטבעות (המחיר הסופי מופיע בתשלום): \n"
+                        f"קישור: {coin_affiliate_link} \n"
                     )
                 
-                # Add bundle affiliate link for 560 channel if available
                 if bundle_affiliate_link:
                     message_text += (
-                        "📦 عرض الحزمة (عروض متنوعة) : \n"
-                        f"الرابط {bundle_affiliate_link} \n"
+                        "📦 דיל חבילה (מבצעים מגוונים): \n"
+                        f"קישור: {bundle_affiliate_link} \n"
                     )
                 
                 message_text += (
-                    f"💎 عرض السوبر : \n"
-                    f"الرابط {super_links} \n"
-                    f"🔥 عرض محدود : \n"
-                    f"الرابط {limit_links} \n\n"
+                    f"💎 מבצע סופר (Super Deal): \n"
+                    f"קישור: {super_links} \n"
+                    f"🔥 הצעה מוגבלת בזמן: \n"
+                    f"קישור: {limit_links} \n\n"
                     "#AliExpressSaverBot ✅"
                 )
                 
@@ -297,31 +274,26 @@ def get_affiliate_links(message, message_id, link):
                                caption=message_text,
                                reply_markup=keyboard)
             else:
-                # Fallback if product details couldn't be fetched
                 bot.delete_message(message.chat.id, message_id)
+                message_text = "השוו בין המחירים וקנו חכם 🔥 \n"
                 
-                # Build fallback message without product details
-                message_text = "قارن بين الاسعار واشتري 🔥 \n"
-                
-                # Add coin-index affiliate link for 620 channel if available
                 if coin_affiliate_link:
                     message_text += (
-                        "💰 عرض العملات (السعر النهائي عند الدفع) : \n"
-                        f"الرابط {coin_affiliate_link} \n"
+                        "💰 מבצע מטבעות (המחיר הסופי מופיע בתשלום): \n"
+                        f"קישור: {coin_affiliate_link} \n"
                     )
                 
-                # Add bundle affiliate link for 560 channel if available
                 if bundle_affiliate_link:
                     message_text += (
-                        "📦 عرض الحزمة (عروض متنوعة) : \n"
-                        f"الرابط {bundle_affiliate_link} \n"
+                        "📦 דיל חבילה (מבצעים מגוונים): \n"
+                        f"קישור: {bundle_affiliate_link} \n"
                     )
                 
                 message_text += (
-                    f"💎 عرض السوبر : \n"
-                    f"الرابط {super_links} \n"
-                    f"🔥 عرض محدود : \n"
-                    f"الرابط {limit_links} \n\n"
+                    f"💎 מבצע סופר (Super Deal): \n"
+                    f"קישור: {super_links} \n"
+                    f"🔥 הצעה מוגבלת בזמן: \n"
+                    f"קישור: {limit_links} \n\n"
                     "#AliExpressSaverBot ✅"
                 )
                 
@@ -330,35 +302,32 @@ def get_affiliate_links(message, message_id, link):
             print(f"Error in get_affiliate_links inner try: {e}")
             bot.delete_message(message.chat.id, message_id)
             
-            # Build fallback message without product details but with all affiliate links
-            message_text = "قارن بين الاسعار واشتري 🔥 \n"
+            message_text = "השוו בין המחירים וקנו חכם 🔥 \n"
             
-            # Add coin-index affiliate link for 620 channel if available
             if coin_affiliate_link:
                 message_text += (
-                    "💰 عرض العملات (السعر النهائي عند الدفع) : \n"
-                    f"الرابط {coin_affiliate_link} \n"
+                    "💰 מבצע מטבעות (המחיר הסופי מופיע בתשלום): \n"
+                    f"קישור: {coin_affiliate_link} \n"
                 )
             
-            # Add bundle affiliate link for 560 channel if available
             if bundle_affiliate_link:
                 message_text += (
-                    "📦 عرض الحزمة (عروض متنوعة) : \n"
-                    f"الرابط {bundle_affiliate_link} \n"
+                    "📦 דיל חבילה (מבצעים מגוונים): \n"
+                    f"קישור: {bundle_affiliate_link} \n"
                 )
             
             message_text += (
-                f"💎 عرض السوبر : \n"
-                f"الرابط {super_links} \n"
-                f"🔥 عرض محدود : \n"
-                f"الرابط {limit_links} \n\n"
+                f"💎 מבצע סופר (Super Deal): \n"
+                f"קישור: {super_links} \n"
+                f"🔥 הצעה מוגבלת בזמן: \n"
+                f"קישור: {limit_links} \n\n"
                 "#AliExpressSaverBot ✅"
             )
             
             bot.send_message(message.chat.id, message_text, reply_markup=keyboard)
     except Exception as e:
         print(f"Error in get_affiliate_links: {e}")
-        bot.send_message(message.chat.id, "حدث خطأ 🤷🏻‍♂️")
+        bot.send_message(message.chat.id, "אופס, משהו השתבש... 🤷🏻‍♂️")
 
 def build_shopcart_link(link):
     params = get_url_params(link)
@@ -381,19 +350,18 @@ def get_affiliate_shopcart_link(link, message):
     try:
         shopcart_link = build_shopcart_link(link)
         affiliate_link = aliexpress.get_affiliate_links(shopcart_link)[0].promotion_link
-        text2 = f"هذا رابط تخفيض السلة \n{str(affiliate_link)}"
+        text2 = f"הנה קישור להנחת העגלה שלך: \n{str(affiliate_link)}"
         img_link3 = "https://i.postimg.cc/1Xrk1RJP/Copy-of-Basket-aliexpress-telegram.png"
         bot.send_photo(message.chat.id, img_link3, caption=text2)
     except Exception as e:
         print(f"Error in get_affiliate_shopcart_link: {e}")
-        bot.send_message(message.chat.id, "حدث خطأ 🤷🏻‍♂️")
+        bot.send_message(message.chat.id, "אופס, משהו השתבש... 🤷🏻‍♂️")
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_callback_query(call):
     try:
         print(f"Callback query received: {call.data}")
         if call.data == 'click':
-            # Replace with your link and message if needed
             link = 'https://www.aliexpress.com/p/shoppingcart/index.html?'
             get_affiliate_shopcart_link(link, call.message)
         else:
@@ -401,13 +369,12 @@ def handle_callback_query(call):
             img_link2 = "https://i.postimg.cc/VvmhgQ1h/Basket-aliexpress-telegram.png"
             bot.send_photo(call.message.chat.id,
                            img_link2,
-                           caption="روابط ألعاب جمع العملات المعدنية لإستعمالها في خفض السعر لبعض المنتجات، قم بالدخول يوميا لها للحصول على أكبر عدد ممكن في اليوم 👇",
+                           caption="קישורים למשחקי איסוף מטבעות כדי להוזיל את מחיר המוצרים. היכנסו מדי יום כדי לאסוף את כמות המטבעות המקסימלית! 👇",
                            reply_markup=keyboard_games)
     except Exception as e:
         print(f"Error in handle_callback_query: {e}")
 
-# Flask app for handling webhook
-
+# אפליקציית Flask לניהול Webhook
 app = Flask(__name__)
 
 @app.route('/webhook', methods=['POST'])
@@ -418,36 +385,32 @@ def webhook():
         bot.process_new_updates([update])
         return 'OK', 200
 
-# Start Flask app in a separate thread
 def run_flask():
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=8080)
 
 if __name__ == "__main__":
-    # Check if we're running in production (webhook) or development (polling) mode
     webhook_url = os.getenv('WEBHOOK_URL')
     
     if webhook_url:
-        # Production mode: Use webhook
-        print("🚀 Starting bot in webhook mode...")
+        # מצב פרודקשן: שימוש ב-Webhook
+        print("🚀 מפעיל את הבוט במצב Webhook...")
         threading.Thread(target=run_flask).start()
         try:
             bot.remove_webhook()
             bot.set_webhook(url=webhook_url)
-            print(f"✅ Webhook set to: {webhook_url}")
+            print(f"✅ Webhook נקבע לכתובת: {webhook_url}")
         except Exception as e:
-            print(f"❌ Error setting webhook: {e}")
+            print(f"❌ שגיאה בהגדרת Webhook: {e}")
     else:
-        # Development mode: Use polling
-        print("🚀 Starting bot in polling mode (development)...")
+        # מצב פיתוח: שימוש ב-Polling
+        print("🚀 מפעיל את הבוט במצב Polling (פיתוח)...")
         try:
-            # Remove any existing webhook first
             bot.remove_webhook()
-            print("✅ Removed existing webhooks")
+            print("✅ Webhooks קודמים הוסרו")
             
-            # Start polling
-            print("🔄 Bot is running... Press Ctrl+C to stop.")
+            print("🔄 הבוט רץ... לחץ על Ctrl+C לעצירה.")
             bot.infinity_polling(none_stop=True, timeout=10, long_polling_timeout=5)
         except KeyboardInterrupt:
-            print("\n👋 Bot stopped by user.")
+            print("\n👋 הבוט נעצר על ידי המשתמש.")
         except Exception as e:
-            print(f"❌ Error in polling mode: {e}")
+            print(f"❌ שגיאה במצב Polling: {e}")
