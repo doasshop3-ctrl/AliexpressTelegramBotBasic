@@ -174,7 +174,7 @@ def welcome_user(message):
     bot.send_message(
         message.chat.id,
         "ברוכים הבאים👋 \n" 
-        "אני בבוט עלי אקספרס! העתיקו את קישור המוצר והדביקו אותו כאן 👇 ותקבלו את כל הצעות המחיר הזולות ביותר 🔥",
+        "אני בוט עלי אקספרס! העתיקו את קישור המוצר והדביקו אותו כאן 👇 ותקבלו את כל הצעות המחיר הזולות ביותר 🔥",
         reply_markup=keyboardStart)
 
 @bot.message_handler(func=lambda message: True)
