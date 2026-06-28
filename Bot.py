@@ -46,27 +46,26 @@ btn1 = types.InlineKeyboardButton("⭐️ דף בדיקה ואיסוף נקוד�
 btn2 = types.InlineKeyboardButton("⭐️ הנחת מטבעות על מוצרים בעגלה 🛒⭐️", callback_data='click')
 btn3 = types.InlineKeyboardButton("❤️ הצטרפו לערוץ לעוד מבצעים ❤️", url="https://t.me/ShopAliExpressMaroc")
 btn4 = types.InlineKeyboardButton("🎬 צפו כיצד הבוט עובד 🎬", url="https://t.me/ShopAliExpressMaroc/9")
-btn5 = types.InlineKeyboardButton("💰 הורד את אפליקציית Aliexpress כאן וקבל בונוס של 5$ 💰", url="https://a.aliexpress.com/_mtV0j3q")
 keyboardStart.add(btn1, btn2, btn3, btn4)
 
 keyboard = types.InlineKeyboardMarkup(row_width=1)
-btn1 = types.InlineKeyboardButton("⭐️ דף בדיקה ואיסוף נקודות יומי ⭐️", url="https://s.click.aliexpress.com/e/_DdwUZVd")
-btn2 = types.InlineKeyboardButton("⭐️ הנחת מטבעות על מוצרים בעגלה 🛒⭐️", callback_data='click')
-btn3 = types.InlineKeyboardButton("❤️ הצטרפו לערוץ לעוד מבצעים ❤️", url="https://t.me/ShopAliExpressMaroc")
-keyboard.add(btn1, btn2, btn3)
+btn_k1 = types.InlineKeyboardButton("⭐️ דף בדיקה ואיסוף נקודות יומי ⭐️", url="https://s.click.aliexpress.com/e/_DdwUZVd")
+btn_k2 = types.InlineKeyboardButton("⭐️ הנחת מטבעות על מוצרים בעגלה 🛒⭐️", callback_data='click')
+btn_k3 = types.InlineKeyboardButton("❤️ הצטרפו לערוץ לעוד מבצעים ❤️", url="https://t.me/ShopAliExpressMaroc")
+keyboard.add(btn_k1, btn_k2, btn_k3)
 
 keyboard_games = types.InlineKeyboardMarkup(row_width=1)
-btn1 = types.InlineKeyboardButton("⭐️ דף בדיקה ואיסוף נקודות יומי ⭐️", url="https://s.click.aliexpress.com/e/_DdwUZVd")
-btn2 = types.InlineKeyboardButton("⭐️ משחק Merge Boss ⭐️", url="https://s.click.aliexpress.com/e/_DlCyg5Z")
-btn3 = types.InlineKeyboardButton("⭐️ משחק החווה (Fantastic Farm) ⭐️", url="https://s.click.aliexpress.com/e/_DBBkt9V")
-btn4 = types.InlineKeyboardButton("⭐️ משחק היפוך קלפים Flip ⭐️", url="https://s.click.aliexpress.com/e/_DdcXZ2r")
-btn5 = types.InlineKeyboardButton("⭐️ משחק GoGo Match ⭐️", url="https://s.click.aliexpress.com/e/_DDs7W5D")
-keyboard_games.add(btn1, btn2, btn3, btn4, btn5)
+btn_g1 = types.InlineKeyboardButton("⭐️ דף בדיקה ואיסוף נקודות יומי ⭐️", url="https://s.click.aliexpress.com/e/_DdwUZVd")
+btn_g2 = types.InlineKeyboardButton("⭐️ משחק Merge Boss ⭐️", url="https://s.click.aliexpress.com/e/_DlCyg5Z")
+btn_g3 = types.InlineKeyboardButton("⭐️ משחק החווה (Fantastic Farm) ⭐️", url="https://s.click.aliexpress.com/e/_DBBkt9V")
+btn_g4 = types.InlineKeyboardButton("⭐️ משחק היפוך קלפים Flip ⭐️", url="https://s.click.aliexpress.com/e/_DdcXZ2r")
+btn_g5 = types.InlineKeyboardButton("⭐️ משחק GoGo Match ⭐️", url="https://s.click.aliexpress.com/e/_DDs7W5D")
+keyboard_games.add(btn_g1, btn_g2, btn_g3, btn_g4, btn_g5)
 
 # פונקציה לקבלת שער חליפין מ-USD ל-ILS (שקלים)
 def get_usd_to_ils_rate():
     try:
-        response = requests.get('https://api.exchangerate-api.com/v4/latest/USD')
+        response = requests.get('https://api.exchangerate-api.com/v4/latest/USD', timeout=5)
         data = response.json()
         return data['rates']['ILS']
     except Exception as e:
@@ -95,12 +94,7 @@ def resolve_full_redirect_chain(link):
                 print(f"🔗 Found redirectUrl: {redirect_url}")
                 return redirect_url
         
-        if "aliexpress.com/item" in final_url:
-            return final_url
-        elif "p/coin-index" in final_url:
-            return final_url
-        else:
-            return final_url
+        return final_url
     except requests.RequestException as e:
         print(f"❌ Error resolving redirect chain for link {link}: {e}")
         return link
@@ -164,6 +158,30 @@ def generate_bundle_affiliate_link(product_id, original_link):
         print(f"❌ Error generating bundle affiliate link for product {product_id}: {e}")
         return None
 
+# פונקציה לחילוץ וניקוי הקישור מתוך הודעת הטקסט
+def extract_link(text):
+    # שלב 1: שליפת הקישור הגולמי מתוך הטקסט
+    link_pattern = r'https?://\S+|www\.\S+'
+    links = re.findall(link_pattern, text)
+    
+    if links:
+        raw_link = links[0]
+        print(f"Extracted raw link: {raw_link}")
+        
+        # שלב 2: אם זה קישור מוצר סטנדרטי של אליאקספרס, ננקה את הפרמטרים שאחרי ה-html
+        clean_product_pattern = r'(https?://[^\s?]+\.html)'
+        match = re.search(clean_product_pattern, raw_link)
+        
+        if match:
+            cleaned_link = match.group(1)
+            print(f"✅ Cleaned AliExpress link: {cleaned_link}")
+            return cleaned_link
+            
+        # אם זה קישור קצר או דף משחק, נחזיר אותו לטובת ה-redirect chain
+        return raw_link
+        
+    return None
+
 # פקודות והודעות בוט בעברית
 @bot.message_handler(commands=['start'])
 def welcome_user(message):
@@ -179,28 +197,19 @@ def echo_all(message):
     try:
         print(f"Message received: {message.text}")
         link = extract_link(message.text)
-        sent_message = bot.send_message(message.chat.id, 'אנא המתינו רגע, המבצעים בדרך אליכם... ⏳')
-        message_id = sent_message.message_id
         if link and "aliexpress.com" in link and not ("p/shoppingcart" in message.text.lower()):
+            sent_message = bot.send_message(message.chat.id, 'אנא המתינו רגע, המבצעים בדרך אליכם... ⏳')
+            message_id = sent_message.message_id
             if "availableProductShopcartIds".lower() in message.text.lower():
                 get_affiliate_shopcart_link(link, message)
                 return
             get_affiliate_links(message, message_id, link)
         else:
-            bot.delete_message(message.chat.id, message_id)
             bot.send_message(message.chat.id, "הקישור אינו תקין! ודא שמדובר בקישור למוצר ונסה שנית.\n"
                                              "שלח את <b>הקישור בלבד</b> ללא כותרת או טקסט נוסף.",
                              parse_mode='HTML')
     except Exception as e:
         print(f"Error in echo_all handler: {e}")
-
-def extract_link(text):
-    link_pattern = r'https?://\S+|www\.\S+'
-    links = re.findall(link_pattern, text)
-    if links:
-        print(f"Extracted link: {links[0]}")
-        return links[0]
-    return None
 
 def get_affiliate_links(message, message_id, link):
     try:
@@ -219,15 +228,20 @@ def get_affiliate_links(message, message_id, link):
         coin_affiliate_link = generate_coin_affiliate_link(product_id)
         bundle_affiliate_link = generate_bundle_affiliate_link(product_id, resolved_link)
         
-        super_links = aliexpress.get_affiliate_links(
-            f'https://star.aliexpress.com/share/share.htm?platform=AE&businessType=ProductDetail&redirectUrl={resolved_link}?sourceType=562&aff_fcid='
-        )
-        super_links = super_links[0].promotion_link
+        try:
+            super_links_data = aliexpress.get_affiliate_links(
+                f'https://star.aliexpress.com/share/share.htm?platform=AE&businessType=ProductDetail&redirectUrl={resolved_link}?sourceType=562&aff_fcid='
+            )
+            super_links = super_links_data[0].promotion_link if super_links_data else resolved_link
 
-        limit_links = aliexpress.get_affiliate_links(
-            f'https://star.aliexpress.com/share/share.htm?platform=AE&businessType=ProductDetail&redirectUrl={resolved_link}?sourceType=561&aff_fcid='
-        )
-        limit_links = limit_links[0].promotion_link
+            limit_links_data = aliexpress.get_affiliate_links(
+                f'https://star.aliexpress.com/share/share.htm?platform=AE&businessType=ProductDetail&redirectUrl={resolved_link}?sourceType=561&aff_fcid='
+            )
+            limit_links = limit_links_data[0].promotion_link if limit_links_data else resolved_link
+        except Exception as api_err:
+            print(f"⚠️ Warning generating super/limit links: {api_err}")
+            super_links = resolved_link
+            limit_links = resolved_link
 
         try:
             product_details = aliexpress.get_products_details([
@@ -282,30 +296,8 @@ def get_affiliate_links(message, message_id, link):
                                caption=message_text,
                                reply_markup=keyboard)
             else:
-                bot.delete_message(message.chat.id, message_id)
-                message_text = "השוו בין המחירים וקנו חכם 🔥 \n"
+                raise Exception("No product details returned from API")
                 
-                if coin_affiliate_link:
-                    message_text += (
-                        "💰 מבצע מטבעות (המחיר הסופי מופיע בתשלום): \n"
-                        f"קישור: {coin_affiliate_link} \n"
-                    )
-                
-                if bundle_affiliate_link:
-                    message_text += (
-                        "📦 דיל חבילה (מבצעים מגוונים): \n"
-                        f"קישור: {bundle_affiliate_link} \n"
-                    )
-                
-                message_text += (
-                    f"💎 מבצע סופר (Super Deal): \n"
-                    f"קישור: {super_links} \n"
-                    f"🔥 הצעה מוגבלת בזמן: \n"
-                    f"קישור: {limit_links} \n\n"
-                    "#AliExpressSaverBot ✅"
-                )
-                
-                bot.send_message(message.chat.id, message_text, reply_markup=keyboard)
         except Exception as e:
             print(f"Error in get_affiliate_links inner try: {e}")
             bot.delete_message(message.chat.id, message_id)
@@ -335,13 +327,17 @@ def get_affiliate_links(message, message_id, link):
             bot.send_message(message.chat.id, message_text, reply_markup=keyboard)
     except Exception as e:
         print(f"Error in get_affiliate_links: {e}")
+        try:
+            bot.delete_message(message.chat.id, message_id)
+        except:
+            pass
         bot.send_message(message.chat.id, "אופס, משהו השתבש... 🤷🏻‍♂️")
 
 def build_shopcart_link(link):
     params = get_url_params(link)
     shop_cart_link = "https://www.aliexpress.com/p/trade/confirm.html?"
     shop_cart_params = {
-        "availableProductShopcartIds": ",".join(params["availableProductShopcartIds"]),
+        "availableProductShopcartIds": ",".join(params.get("availableProductShopcartIds", [])),
         "extraParams": json.dumps({"channelInfo": {"sourceType": "620"}}, separators=(',', ':'))
     }
     return create_query_string_url(link=shop_cart_link, params=shop_cart_params)
@@ -357,10 +353,14 @@ def create_query_string_url(link, params):
 def get_affiliate_shopcart_link(link, message):
     try:
         shopcart_link = build_shopcart_link(link)
-        affiliate_link = aliexpress.get_affiliate_links(shopcart_link)[0].promotion_link
-        text2 = f"הנה קישור להנחת העגלה שלך: \n{str(affiliate_link)}"
-        img_link3 = "https://i.postimg.cc/1Xrk1RJP/Copy-of-Basket-aliexpress-telegram.png"
-        bot.send_photo(message.chat.id, img_link3, caption=text2)
+        affiliate_links_data = aliexpress.get_affiliate_links(shopcart_link)
+        if affiliate_links_data:
+            affiliate_link = affiliate_links_data[0].promotion_link
+            text2 = f"הנה קישור להנחת העגלה שלך: \n{str(affiliate_link)}"
+            img_link3 = "https://i.postimg.cc/1Xrk1RJP/Copy-of-Basket-aliexpress-telegram.png"
+            bot.send_photo(message.chat.id, img_link3, caption=text2)
+        else:
+            bot.send_message(message.chat.id, "❌ לא הצלחתי לייצר קישור להנחת עגלה.")
     except Exception as e:
         print(f"Error in get_affiliate_shopcart_link: {e}")
         bot.send_message(message.chat.id, "אופס, משהו השתבש... 🤷🏻‍♂️")
@@ -394,7 +394,9 @@ def webhook():
         return 'OK', 200
 
 def run_flask():
-    app.run(host='0.0.0.0', PORT=10000)
+    # האותיות הקטנות בשם הפרמטר port מתאימות ל-Flask
+    server_port = int(os.getenv("PORT", 10000))
+    app.run(host='0.0.0.0', port=server_port)
 
 if __name__ == "__main__":
     webhook_url = os.getenv('WEBHOOK_URL')
@@ -415,7 +417,6 @@ if __name__ == "__main__":
         try:
             bot.remove_webhook()
             print("✅ Webhooks קודמים הוסרו")
-            
             print("🔄 הבוט רץ... לחץ על Ctrl+C לעצירה.")
             bot.infinity_polling(none_stop=True, timeout=10, long_polling_timeout=5)
         except KeyboardInterrupt:
